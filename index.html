@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>EmpresarioAgil | Business Model Canvas Profissional</title>
+    <meta name="description" content="EmpresarioAgil - Monte seu Business Model Canvas de forma rápida e profissional.">
+
+    <!-- Google Analytics (GA4) -->
+    <!-- Substitua "G-XXXXXXXXXX" pelo seu ID de métricas do Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-XXXXXXXXXX');
+
+        // Helper global para disparar eventos customizados do GA a partir de qualquer lugar do app
+        function trackEvent(eventName, params) {
+            try {
+                if (typeof gtag === 'function') {
+                    gtag('event', eventName, params || {});
+                }
+            } catch (e) { /* silencioso: analytics nunca deve quebrar o app */ }
+        }
+    </script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        
+        .canvas-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-template-rows: auto auto auto;
+            gap: 1px;
+            background-color: #e5e7eb;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .canvas-box {
+            background: white;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            min-height: 180px;
+            transition: all 0.2s ease;
+        }
+
+        .canvas-box:hover { background-color: #fafafa; }
+        
+        .canvas-box-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #6b7280;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .canvas-box-hint {
+            font-size: 0.7rem;
+            font-style: italic;
+            color: #9ca3af;
+            margin-bottom: 0.5rem;
+            line-height: 1.2;
+        }
+
+        .editable-area { 
+            flex-grow: 1; 
+            outline: none; 
+            font-size: 0.9rem; 
+            color: #1f2937;
+            overflow-y: auto;
+        }
+        
+        [contenteditable]:focus { background-color: #f9fafb; }
+
+        .icon-box { width: 20px; height: 20px; color: #f97316; }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.6rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            font-size: 0.85rem;
+            border: 1px solid #e5e7eb;
+            background: white;
+            color: #374151;
+            transition: all 0.15s ease;
+            cursor: pointer;
+        }
+        .download-btn:hover { background-color: #f9fafb; border-color: #f97316; color: #f97316; }
+        .download-btn svg { width: 16px; height: 16px; }
+
+        /* --- Brand / Logo --- */
+        .brand-mark {
+            width: 40px;
+            height: 40px;
+            border-radius: 0.6rem;
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(249, 115, 22, 0.35);
+        }
+        .brand-mark svg { width: 22px; height: 22px; color: white; }
+        .powered-by { font-size: 0.7rem; color: #9ca3af; }
+        .powered-by span { color: #f97316; font-weight: 600; }
+
+        /* --- Modal (shared design tokens) --- */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(17, 24, 39, 0.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            z-index: 100;
+        }
+        .modal-box {
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 420px;
+            padding: 1.5rem;
+        }
+        .modal-input {
+            width: 100%;
+            padding: 0.65rem 0.85rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.15s ease;
+            color: #1f2937;
+        }
+        .modal-input:focus { border-color: #f97316; }
+        .modal-primary-btn {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            border-radius: 0.5rem;
+            background: #f97316;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: none;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+        .modal-primary-btn:hover { background: #ea580c; }
+        .modal-primary-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        /* --- Floating feedback button --- */
+        .feedback-fab {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            background: white;
+            border: 1px solid #e5e7eb;
+            color: #374151;
+            padding: 0.75rem 1.1rem;
+            border-radius: 999px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            z-index: 40;
+            transition: all 0.15s ease;
+        }
+        .feedback-fab:hover { border-color: #f97316; color: #f97316; }
+        .feedback-fab svg { width: 16px; height: 16px; }
+
+        /* --- Responsive: mobile / small devices --- */
+        @media (max-width: 768px) {
+            .canvas-grid {
+                display: flex;
+                flex-direction: column;
+            }
+            .canvas-box {
+                min-height: 140px;
+            }
+            .feedback-fab span { display: none; }
+            .feedback-fab { padding: 0.75rem; border-radius: 999px; }
+        }
+        @media (max-width: 480px) {
+            .canvas-box-title { font-size: 0.65rem; }
+            .editable-area { font-size: 0.85rem; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen text-gray-900">
+
+    <div class="max-w-7xl mx-auto p-4 md:p-8">
+        <header class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+            <div class="flex items-center gap-3">
+                
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900 text-italic">Empresario Agil App</h1>
+                    <p class="text-gray-500">Business Model Canvas &middot; Planejamento Estratégico Profissional</p>
+                    <p class="powered-by">
+                        Desenvolvido pela <i class="font-bold text-underline cursor-pointerhref="https://www.exinndigital.com" target="_blank">Exinn Digital Technology</span> & Designed ❤️ by <i href="https://www.linkedin.com/in/realkevinbrian" target="_blank">Kevin Brian</span>
+                    </p>
+                </div>
+            </div>
+            <div class="flex flex-col md:flex-row items-center gap-3">
+                <div class="flex p-1 bg-white border border-gray-200 rounded-lg shadow-sm">
+                    <button id="toggleCanvas" onclick="switchMode('canvas')" class="px-6 py-2 rounded-md bg-orange-500 text-white font-medium shadow-sm">Canvas</button>
+                    <button id="toggleWizard" onclick="switchMode('wizard')" class="px-6 py-2 rounded-md text-gray-600 hover:bg-gray-50 font-medium">Formulário</button>
+                </div>
+                <div class="flex gap-2">
+                    <button class="download-btn" onclick="downloadImage()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                        Baixar Imagem
+                    </button>
+                    <button class="download-btn" onclick="downloadPDF()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                        Baixar PDF
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div id="viewCanvas" class="canvas-grid shadow-xl rounded-lg overflow-hidden border-2 border-gray-200">
+            <!-- Col 1 -->
+            <div class="canvas-box ord-8 col-start-1 row-start-1 row-span-2">
+                <div class="canvas-box-title"><span id="icon-8"></span> 8. Parceiros-Chave</div>
+                <div class="canvas-box-hint">Quem são seus principais fornecedores e parceiros estratégicos?</div>
+                <div id="field-7" class="editable-area" contenteditable="true" oninput="syncData(7, this.innerText)"></div>
+            </div>
+            
+            <!-- Col 2 -->
+            <div class="canvas-box ord-7 col-start-2 row-start-1">
+                <div class="canvas-box-title"><span id="icon-7"></span> 7. Atividades-Chave</div>
+                <div class="canvas-box-hint">Quais atividades são indispensáveis para entregar sua proposta de valor?</div>
+                <div id="field-6" class="editable-area" contenteditable="true" oninput="syncData(6, this.innerText)"></div>
+            </div>
+            <div class="canvas-box ord-6 col-start-2 row-start-2">
+                <div class="canvas-box-title"><span id="icon-6"></span> 6. Recursos-Chave</div>
+                <div class="canvas-box-hint">Quais recursos são essenciais para o funcionamento do seu modelo?</div>
+                <div id="field-5" class="editable-area" contenteditable="true" oninput="syncData(5, this.innerText)"></div>
+            </div>
+
+            <!-- Col 3 (Center) -->
+            <div class="canvas-box ord-2 col-start-3 row-start-1 row-span-2">
+                <div class="canvas-box-title"><span id="icon-2"></span> 2. Proposta de Valor</div>
+                <div class="canvas-box-hint">Que valor você entrega ao cliente? Qual problema você resolve?</div>
+                <div id="field-1" class="editable-area" contenteditable="true" oninput="syncData(1, this.innerText)"></div>
+            </div>
+
+            <!-- Col 4 -->
+            <div class="canvas-box ord-4 col-start-4 row-start-1">
+                <div class="canvas-box-title"><span id="icon-4"></span> 4. Relacionamento</div>
+                <div class="canvas-box-hint">Que tipo de relação cada segmento de clientes espera que você mantenha?</div>
+                <div id="field-3" class="editable-area" contenteditable="true" oninput="syncData(3, this.innerText)"></div>
+            </div>
+            <div class="canvas-box ord-3 col-start-4 row-start-2">
+                <div class="canvas-box-title"><span id="icon-3"></span> 3. Canais</div>
+                <div class="canvas-box-hint">Como você alcança e entrega valor aos seus clientes?</div>
+                <div id="field-2" class="editable-area" contenteditable="true" oninput="syncData(2, this.innerText)"></div>
+            </div>
+
+            <!-- Col 5 -->
+            <div class="canvas-box col-start-5 row-start-1 row-span-2">
+                <div class="canvas-box-title"><span id="icon-1"></span> 1. Clientes</div>
+                <div class="canvas-box-hint">Quem são as pessoas ou organizações que você busca atender?</div>
+                <div id="field-0" class="editable-area" contenteditable="true" oninput="syncData(0, this.innerText)"></div>
+            </div>
+
+            <!-- Bottom Row -->
+            <div class="canvas-box col-start-1 col-span-2 row-start-3">
+                <div class="canvas-box-title"><span id="icon-9"></span> 9. Estrutura de Custos</div>
+                <div class="canvas-box-hint">Quais são os principais custos envolvidos na operação do negócio?</div>
+                <div id="field-8" class="editable-area" contenteditable="true" oninput="syncData(8, this.innerText)"></div>
+            </div>
+            <div class="canvas-box col-start-3 col-span-3 row-start-3">
+                <div class="canvas-box-title"><span id="icon-5"></span> 5. Fontes de Receita</div>
+                <div class="canvas-box-hint">Como e por qual valor os clientes pagam pelo que você oferece?</div>
+                <div id="field-4" class="editable-area" contenteditable="true" oninput="syncData(4, this.innerText)"></div>
+            </div>
+        </div>
+
+        <div id="viewWizard" class="hidden bg-white p-8 rounded-xl shadow-lg border border-gray-200 min-h-[500px] flex flex-col">
+            <div id="stepper" class="flex justify-between items-center mb-12 relative px-4">
+                <div class="absolute top-1/2 left-0 w-full h-0.5 bg-gray-200 -z-0"></div>
+            </div>
+            <div id="wizardContent" class="flex-grow max-w-2xl mx-auto w-full"></div>
+            <div class="flex justify-between pt-8 border-t mt-8">
+                <button id="btnPrev" onclick="navigate(-1)" class="px-8 py-3 rounded-lg border border-gray-300 hover:bg-gray-50 text-gray-700">Voltar</button>
+                <button id="btnNext" onclick="navigate(1)" class="px-8 py-3 rounded-lg bg-orange-500 text-white hover:bg-orange-600">Próximo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botão flutuante: solicitar funcionalidade/melhoria -->
+    <button class="feedback-fab" onclick="openFeedbackModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        <span>Sugerir melhoria</span>
+    </button>
+
+    <!-- Modal: Download bloqueado (captura de lead) -->
+    <div id="lockModal" class="modal-overlay hidden">
+        <div class="modal-box">
+            <div class="flex items-center gap-2 mb-1">
+                <div class="brand-mark" style="width:32px;height:32px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width:18px;height:18px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900">Quase lá!</h3>
+            </div>
+            <p class="text-sm text-gray-500 mb-4">Informe seu nome e telefone para liberar o download do seu Business Model Canvas.</p>
+            <form id="lockForm" class="space-y-3" onsubmit="handleLockSubmit(event)">
+                <div>
+                    <label class="text-xs font-medium text-gray-600 mb-1 block">Nome</label>
+                    <input id="lockName" type="text" required class="modal-input" placeholder="Seu nome completo">
+                </div>
+                <div>
+                    <label class="text-xs font-medium text-gray-600 mb-1 block">Telefone</label>
+                    <input id="lockPhone" type="tel" required class="modal-input" placeholder="+258 84 000 0000">
+                </div>
+                <p id="lockError" class="text-xs text-red-500 hidden"></p>
+                <button id="lockSubmitBtn" type="submit" class="modal-primary-btn">Liberar Download</button>
+                <button type="button" onclick="closeLockModal()" class="w-full text-center text-sm text-gray-400 hover:text-gray-600 pt-1">Cancelar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Sugerir funcionalidade/melhoria -->
+    <div id="feedbackModal" class="modal-overlay hidden">
+        <div class="modal-box">
+            <div class="flex items-center justify-between mb-1">
+                <h3 class="text-lg font-bold text-gray-900">Sugerir uma melhoria</h3>
+                <button onclick="closeFeedbackModal()" class="text-gray-400 hover:text-gray-600 text-xl leading-none">&times;</button>
+            </div>
+            <p class="text-sm text-gray-500 mb-4">Conte-nos o que gostaria de ver no EmpresarioAgil.</p>
+            <form id="feedbackForm" class="space-y-3" onsubmit="handleFeedbackSubmit(event)">
+                <div>
+                    <label class="text-xs font-medium text-gray-600 mb-1 block">Nome</label>
+                    <input id="fbName" type="text" required class="modal-input" placeholder="Seu nome">
+                </div>
+                <div>
+                    <label class="text-xs font-medium text-gray-600 mb-1 block">E-mail ou Telefone</label>
+                    <input id="fbContact" type="text" required class="modal-input" placeholder="email@exemplo.com ou telefone">
+                </div>
+                <div>
+                    <label class="text-xs font-medium text-gray-600 mb-1 block">Sua sugestão</label>
+                    <textarea id="fbMessage" required rows="4" class="modal-input" placeholder="Descreva a funcionalidade ou melhoria..."></textarea>
+                </div>
+                <p id="fbStatus" class="text-xs hidden"></p>
+                <button id="fbSubmitBtn" type="submit" class="modal-primary-btn">Enviar sugestão</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ============ CONFIGURAÇÃO ============
+        // Substitua pelas URLs reais dos seus endpoints de API.
+        const CONFIG = {
+            LEAD_API_URL: 'https://n8n.exinndigital.com/webhook-test/canvas?target=leads',       // recebe {name, phone, source}
+            FEEDBACK_API_URL: 'https://n8n.exinndigital.com/webhook-test/canvas?target=feedback', // recebe {name, contact, message, source}
+            STORAGE_KEY_DATA: 'empresarioagil_canvas_data',
+            STORAGE_KEY_LEAD: 'empresarioagil_lead_unlocked'
+        };
+
+        const icons = [
+            '<svg class="icon-box" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>', // 1
+            '<svg class="icon-box" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>', // 2
+            '<svg class="icon-box" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>', // 3
+            '<svg class="icon-box" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>', // 4
+            '<svg class="icon-box" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>', // 5
+            '<svg class="icon-box" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>', // 6
+            '<svg class="icon-box" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>', // 7
+            '<svg class="icon-box" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>', // 8
+            '<svg class="icon-box" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>' // 9
+        ];
+
+        const steps = [
+            { id: 0, title: "Segmentos de Clientes", hint: "Quem são as pessoas ou organizações que você busca atender? Liste os diferentes grupos de clientes do seu negócio." },
+            { id: 1, title: "Proposta de Valor", hint: "Que valor você entrega ao cliente? Qual problema você resolve ou qual necessidade você satisfaz?" },
+            { id: 2, title: "Canais", hint: "Como você alcança seus clientes e entrega sua proposta de valor até eles (comunicação, distribuição, vendas)?" },
+            { id: 3, title: "Relacionamento com Clientes", hint: "Que tipo de relacionamento cada segmento de clientes espera que você estabeleça e mantenha?" },
+            { id: 4, title: "Fontes de Receita", hint: "Como e por qual valor os clientes estão dispostos a pagar pelo que você oferece?" },
+            { id: 5, title: "Recursos-Chave", hint: "Quais recursos (físicos, humanos, financeiros ou intelectuais) são essenciais para o funcionamento do seu modelo de negócio?" },
+            { id: 6, title: "Atividades-Chave", hint: "Quais atividades são indispensáveis para que sua proposta de valor seja entregue com sucesso?" },
+            { id: 7, title: "Parceiros-Chave", hint: "Quem são seus principais fornecedores e parceiros estratégicos, e o que você obtém dessas parcerias?" },
+            { id: 8, title: "Estrutura de Custos", hint: "Quais são os principais custos envolvidos na operação do seu negócio?" }
+        ];
+
+        let currentStep = 0;
+        const data = Array(9).fill("");
+
+        function initApp() {
+            // Setup icons in canvas
+            icons.forEach((icon, i) => {
+                const el = document.getElementById(`icon-${i+1}`);
+                if(el) el.innerHTML = icon;
+            });
+            // Create stepper circles
+            const stepper = document.getElementById('stepper');
+            steps.forEach((s, i) => {
+                const div = document.createElement('div');
+                div.className = "z-10 flex flex-col items-center cursor-pointer group";
+                div.innerHTML = `
+                    <div id="step-dot-${i}" class="w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all border-2 ${i === 0 ? 'bg-orange-500 border-orange-500 text-white' : 'bg-white border-gray-300 text-gray-400'}">
+                        ${i+1}
+                    </div>
+                `;
+                div.onclick = () => jumpToStep(i);
+                stepper.appendChild(div);
+            });
+
+            loadPersistedData();
+            renderStep();
+            trackEvent('app_loaded', { app_name: 'EmpresarioAgil' });
+        }
+
+        // ============ PERSISTÊNCIA (localStorage) ============
+        function loadPersistedData() {
+            try {
+                const saved = localStorage.getItem(CONFIG.STORAGE_KEY_DATA);
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (Array.isArray(parsed) && parsed.length === data.length) {
+                        parsed.forEach((val, i) => {
+                            data[i] = val || "";
+                            const field = document.getElementById(`field-${i}`);
+                            if (field) field.innerText = data[i];
+                        });
+                    }
+                }
+            } catch (e) { /* dados corrompidos ou indisponíveis: ignora silenciosamente */ }
+        }
+
+        function persistData() {
+            try {
+                localStorage.setItem(CONFIG.STORAGE_KEY_DATA, JSON.stringify(data));
+            } catch (e) { /* storage indisponível (ex: modo privado) */ }
+        }
+
+        function jumpToStep(i) { currentStep = i; renderStep(); }
+        function navigate(dir) { 
+            currentStep = Math.max(0, Math.min(steps.length - 1, currentStep + dir));
+            renderStep();
+        }
+
+        function renderStep() {
+            const wizard = document.getElementById('wizardContent');
+            wizard.innerHTML = `
+                <div class="space-y-4">
+                    <h2 class="text-3xl font-bold text-gray-900">${steps[currentStep].title}</h2>
+                    <p class="text-gray-500 text-lg">Etapa ${currentStep + 1} de 9</p>
+                    <p class="text-gray-400 text-sm italic">${steps[currentStep].hint}</p>
+                    <textarea class="w-full h-56 p-6 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-200 outline-none transition" 
+                              placeholder="Digite os detalhes aqui..."
+                              oninput="syncFromWizard(${currentStep}, this.value)">${data[currentStep]}</textarea>
+                </div>
+            `;
+            // Update UI
+            steps.forEach((s, i) => {
+                const dot = document.getElementById(`step-dot-${i}`);
+                if(i === currentStep) dot.className = "w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all border-2 bg-orange-500 border-orange-500 text-white";
+                else if(i < currentStep) dot.className = "w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all border-2 bg-orange-100 border-orange-500 text-orange-600";
+                else dot.className = "w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all border-2 bg-white border-gray-300 text-gray-400";
+            });
+        }
+
+        function syncData(index, val) { data[index] = val; persistData(); }
+        function syncFromWizard(index, val) { 
+            data[index] = val; 
+            document.getElementById(`field-${index}`).innerText = val; 
+            persistData();
+        }
+
+        function switchMode(mode) {
+            const c = document.getElementById('viewCanvas'), w = document.getElementById('viewWizard');
+            const btnC = document.getElementById('toggleCanvas'), btnW = document.getElementById('toggleWizard');
+            if(mode === 'canvas') {
+                c.classList.remove('hidden'); w.classList.add('hidden');
+                btnC.className = "px-6 py-2 rounded-md bg-orange-500 text-white font-medium shadow-sm";
+                btnW.className = "px-6 py-2 rounded-md text-gray-600 hover:bg-gray-50 font-medium";
+            } else {
+                w.classList.remove('hidden'); c.classList.add('hidden');
+                btnW.className = "px-6 py-2 rounded-md bg-orange-500 text-white font-medium shadow-sm";
+                btnC.className = "px-6 py-2 rounded-md text-gray-600 hover:bg-gray-50 font-medium";
+            }
+        }
+
+        // --- Download features (client-side only, no server/user dependency) ---
+        function ensureCanvasView(callback) {
+            const wasWizard = !document.getElementById('viewCanvas').classList.contains('hidden') ? false : true;
+            if (wasWizard) switchMode('canvas');
+            setTimeout(() => {
+                callback();
+                if (wasWizard) switchMode('wizard');
+            }, 50);
+        }
+
+        function performDownloadImage() {
+            ensureCanvasView(() => {
+                const target = document.getElementById('viewCanvas');
+                html2canvas(target, { scale: 2, backgroundColor: '#ffffff' }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = 'empresarioagil-business-model-canvas.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                    trackEvent('download', { format: 'image' });
+                });
+            });
+        }
+
+        function performDownloadPDF() {
+            ensureCanvasView(() => {
+                const target = document.getElementById('viewCanvas');
+                html2canvas(target, { scale: 2, backgroundColor: '#ffffff' }).then(canvas => {
+                    const { jsPDF } = window.jspdf;
+                    const imgData = canvas.toDataURL('image/png');
+                    const pdf = new jsPDF({
+                        orientation: 'landscape',
+                        unit: 'pt',
+                        format: 'a4'
+                    });
+                    const pageWidth = pdf.internal.pageSize.getWidth();
+                    const pageHeight = pdf.internal.pageSize.getHeight();
+                    const imgWidth = canvas.width;
+                    const imgHeight = canvas.height;
+                    const ratio = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
+                    const finalWidth = imgWidth * ratio;
+                    const finalHeight = imgHeight * ratio;
+                    const x = (pageWidth - finalWidth) / 2;
+                    const y = (pageHeight - finalHeight) / 2;
+                    pdf.addImage(imgData, 'PNG', x, y, finalWidth, finalHeight);
+                    pdf.save('empresarioagil-business-model-canvas.pdf');
+                    trackEvent('download', { format: 'pdf' });
+                });
+            });
+        }
+
+        // ============ DOWNLOAD BLOQUEADO (captura de lead) ============
+        let pendingDownloadType = null; // 'image' | 'pdf'
+
+        function isUnlocked() {
+            try {
+                return localStorage.getItem(CONFIG.STORAGE_KEY_LEAD) === 'true';
+            } catch (e) { return false; }
+        }
+
+        function downloadImage() {
+            pendingDownloadType = 'image';
+            if (isUnlocked()) { performDownloadImage(); return; }
+            trackEvent('download_lock_shown', { format: 'image' });
+            openLockModal();
+        }
+
+        function downloadPDF() {
+            pendingDownloadType = 'pdf';
+            if (isUnlocked()) { performDownloadPDF(); return; }
+            trackEvent('download_lock_shown', { format: 'pdf' });
+            openLockModal();
+        }
+
+        function openLockModal() {
+            document.getElementById('lockError').classList.add('hidden');
+            document.getElementById('lockModal').classList.remove('hidden');
+        }
+        function closeLockModal() {
+            document.getElementById('lockModal').classList.add('hidden');
+            pendingDownloadType = null;
+        }
+
+        function handleLockSubmit(event) {
+            event.preventDefault();
+            const name = document.getElementById('lockName').value.trim();
+            const phone = document.getElementById('lockPhone').value.trim();
+            const errorEl = document.getElementById('lockError');
+            const btn = document.getElementById('lockSubmitBtn');
+            errorEl.classList.add('hidden');
+
+            if (!name || !phone) return;
+
+            btn.disabled = true;
+            btn.textContent = 'Verificando...';
+
+            fetch(CONFIG.LEAD_API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, phone, source: 'EmpresarioAgil - Business Model Canvas' })
+            })
+            .then(res => {
+                if (!res.ok) throw new Error('Falha na resposta da API');
+                return res.json().catch(() => ({}));
+            })
+            .then(() => {
+                try { localStorage.setItem(CONFIG.STORAGE_KEY_LEAD, 'true'); } catch (e) {}
+                trackEvent('lead_captured', { source: 'download_lock' });
+                closeLockModal();
+                if (pendingDownloadType === 'image') performDownloadImage();
+                else if (pendingDownloadType === 'pdf') performDownloadPDF();
+            })
+            .catch(() => {
+                errorEl.textContent = 'Não foi possível validar seus dados agora. Tente novamente.';
+                errorEl.classList.remove('hidden');
+            })
+            .finally(() => {
+                btn.disabled = false;
+                btn.textContent = 'Liberar Download';
+            });
+        }
+
+        // ============ MODAL DE SUGESTÃO / FEEDBACK ============
+        function openFeedbackModal() {
+            document.getElementById('fbStatus').classList.add('hidden');
+            document.getElementById('feedbackModal').classList.remove('hidden');
+            trackEvent('feedback_modal_opened', {});
+        }
+        function closeFeedbackModal() {
+            document.getElementById('feedbackModal').classList.add('hidden');
+        }
+
+        function handleFeedbackSubmit(event) {
+            event.preventDefault();
+            const name = document.getElementById('fbName').value.trim();
+            const contact = document.getElementById('fbContact').value.trim();
+            const message = document.getElementById('fbMessage').value.trim();
+            const statusEl = document.getElementById('fbStatus');
+            const btn = document.getElementById('fbSubmitBtn');
+
+            if (!name || !contact || !message) return;
+
+            btn.disabled = true;
+            btn.textContent = 'Enviando...';
+            statusEl.classList.add('hidden');
+
+            fetch(CONFIG.FEEDBACK_API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, contact, message, source: 'EmpresarioAgil - Business Model Canvas' })
+            })
+            .then(res => {
+                if (!res.ok) throw new Error('Falha na resposta da API');
+                return res.json().catch(() => ({}));
+            })
+            .then(() => {
+                trackEvent('feedback_submitted', {});
+                statusEl.textContent = 'Obrigado! Sua sugestão foi enviada com sucesso.';
+                statusEl.className = 'text-xs text-green-600';
+                statusEl.classList.remove('hidden');
+                document.getElementById('feedbackForm').reset();
+                setTimeout(closeFeedbackModal, 1800);
+            })
+            .catch(() => {
+                statusEl.textContent = 'Não foi possível enviar agora. Tente novamente em instantes.';
+                statusEl.className = 'text-xs text-red-500';
+                statusEl.classList.remove('hidden');
+            })
+            .finally(() => {
+                btn.disabled = false;
+                btn.textContent = 'Enviar sugestão';
+            });
+        }
+
+        window.onload = initApp;
+    </script>
+</body>
+</html>
